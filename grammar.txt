@@ -1,4 +1,9 @@
-expr     : term ((PLUS|MINUS) term)*
+# Parser grammer rule definitions.
+# defined in order of priority with least at top.
+
+
+expr    : KEYWORD:VAR IDENTIFIER EQ expr
+        : term ((PLUS|MINUS) term)*
 
 term    : factor ((MUL|DIV) factor)*
 
@@ -7,5 +12,5 @@ factor  : (PLUS|MINUS) factor
 
 power   : atom (POW factor)* 
 
-atom    : INT|FLOAT
+atom    : INT|FLOAT|IDENTIFIER
         : LPAREL expr RPAREN
