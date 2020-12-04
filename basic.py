@@ -2,6 +2,7 @@
 # IMPORTS
 #############################
 from string_with_arrows import *
+import string
 
 
 
@@ -9,6 +10,8 @@ from string_with_arrows import *
 # CONSTANTS
 #############################
 DIGITS = '0123456789'
+LETTERS = string.ascii_letters
+LETTERS_DIGITS = LETTERS + DIGITS
 
 
 
@@ -40,11 +43,11 @@ class InvalidSyntaxError(Error):
 class RTError(Error):
     def __init__(self, pos_start, pos_end, details, context):
         super().__init__(pos_start, pos_end, 'Runtime Error', details)
-        self.context= context
+        self.context = context
     
     def as_string(self):
         result = self.generate_traceback()
-        result += f'{self.error_name}: {self.details}\n'
+        result += f'{self.error_name}: {self.details}'
         result += '\n\n' + string_with_arrows(self.pos_start.ftxt, self.pos_start, self.pos_end)
         return result
 
@@ -54,7 +57,7 @@ class RTError(Error):
         ctx = self.context
 
         while ctx:
-            result = f' File {pos.fn}, line {str(pos.ln)}, in {ctx.display_name}\n' + result
+            result = f'  File {pos.fn}, line {str(pos.ln + 1)}, in {ctx.display_name}\n' + result
             pos = ctx.parent_entry_pos
             ctx = ctx.parent
 
@@ -94,16 +97,22 @@ class Position:
 #############################
 
 # Token type constants
-TT_INT      = 'INT'
-TT_FLOAT    = 'FLOAT'
-TT_PLUS     = 'PLUS'
-TT_MINUS    = 'MINUS'
-TT_MUL      = 'MUL'
-TT_DIV      = 'DIV'
-TT_POW      = 'POW'
-TT_LPAREN   = 'LPAREN'
-TT_RPAREN   = 'RPAREN'
-TT_EOF      = 'EOF'
+TT_INT          = 'INT'
+TT_FLOAT        = 'FLOAT'
+TT_IDENTIFIER   = 'IDENTIFIER'
+TT_KEYWORD      = 'KEYWORD'
+TT_PLUS         = 'PLUS'
+TT_MINUS        = 'MINUS'
+TT_MUL          = 'MUL'
+TT_DIV          = 'DIV'
+TT_POW          = 'POW'
+TT_EQ           = 'EQ'
+TT_LPAREN       = 'LPAREN'
+TT_RPAREN       = 'RPAREN'
+TT_EOF          = 'EOF'
+
+KEYWORDS = [ \
+    'VAR']
 
 class Token:
     def __init__(self, type_, value=None, pos_start=None, pos_end=None):
@@ -111,12 +120,12 @@ class Token:
         self.value = value
 
         if pos_start:
-            self.pos_start = pos_start
+            self.pos_start = pos_start.copy()
             self.pos_end = pos_start.copy()
             self.pos_end.advance()
 
         if pos_end:
-            self.pos_end = pos_end
+            self.pos_end = pos_end.copy()
 
     def __repr__(self):
         if self.value: return f'{self.type}:{self.value}'
@@ -148,7 +157,8 @@ class Lexer:
                 self.advance()              # advance thru any sapce or tab characters
             elif self.current_char in DIGITS:
                 tokens.append(self.make_number())
-    
+            elif self.current_char in LETTERS:
+                tokens.append(self.make_identifier())
             elif self.current_char == '+':
                 tokens.append(Token(TT_PLUS, pos_start=self.pos))
                 self.advance()
@@ -163,6 +173,9 @@ class Lexer:
                 self.advance()
             elif self.current_char == '^':
                 tokens.append(Token(TT_POW, pos_start=self.pos))
+                self.advance()
+            elif self.current_char == '=':
+                tokens.append(Token(TT_EQ, pos_start=self.pos))
                 self.advance()
             elif self.current_char == '(':
                 tokens.append(Token(TT_LPAREN, pos_start=self.pos))
@@ -188,7 +201,7 @@ class Lexer:
         while self.current_char != None and self.current_char in DIGITS + '.':
             if self.current_char == '.':
                 if dot_count == 1: break    # end search if more than one '.' found.  
-                num_str += '.'
+                # num_str += '.'
                 dot_count += 1
             else:
                 num_str += self.current_char
@@ -198,6 +211,19 @@ class Lexer:
             return Token(TT_INT, int(num_str), pos_start, self.pos)
         else:
             return Token(TT_FLOAT, float(num_str), pos_start, self.pos)
+
+    def make_identifier(self):
+        id_str = ''
+        pos_start = self.pos.copy()
+
+        while self.current_char != None and self.current_char in LETTERS_DIGITS + '_':
+            id_str += self.current_char
+            self.advance()
+
+        tok_type = TT_KEYWORD if id_str in KEYWORDS else TT_IDENTIFIER
+        return Token(tok_type, id_str, pos_start, self.pos)
+
+        
 
 
 
