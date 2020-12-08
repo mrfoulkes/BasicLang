@@ -1,4 +1,4 @@
-# Parser grammer rule definitions.
+# Parser grammar rule definitions.
 # defined in order of priority with least at top.
 
 
@@ -20,9 +20,129 @@ power           : atom (POW factor)*
 atom            : INT|FLOAT|IDENTIFIER
                 : LPAREL expr RPAREN
                 : if-expr
+                : for-expr
+                : while-expr
 
 if-expr         : KEYWORD:IF expr KEYWORD:THEN expr
                   (KEYWORD:ELIF expr KEYWORD:THEN expr)*
                   (KEYWORD:ELSE expr)?
+
+for-expr        : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:TO expr
+                  (KEYWORD:STEP expr)? KEYWORD:THEN expr
+
+while-expr      : KEYWORD:WHILE expr KEYWORD:THEN expr
+
+
+.
+
+# Grammar examples.
+
+##############################
+# Basic math statements
+##############################
+
+basic > 1 + 2
+3
+basic > 1 - 2
+-1
+basic > 1 * 2
+2
+basic > 1 / 2
+0.5
+basic > 1 ^ 2
+1
+basic > 2 ^ 2
+4
+basic > 1 + 2 * 3
+7
+basic > 1 + (2 * 3)
+7
+basic > (1 + 2 ) * 3
+9
+
+
+##############################
+# Variables
+##############################
+
+basic > VAR a = 1
+1
+basic > a + 2 
+3
+basic > a + (VAR b = 2)
+3
+basic > b
+2
+basic > VAR c = VAR d = VAR e = 10
+10
+basic > c
+10
+basic > d
+10
+basic > e
+10
+basic > NULL
+0
+
+##############################
+# Comparison operatores
+##############################
+
+basic > 5 == 5
+1
+basic > 6 == 4
+0
+basic > 2 + 8 == 5 + 5
+1
+basic > 1 == 1 AND 2 == 2
+1
+basic > 1 == 1 OR 2 == 3
+1
+basic > NOT 1 == 1
+0
+basic > 5 < 6
+1
+basic > 5 > 6
+0
+basic > 6 > 6
+0
+basic > 6 >= 6
+1
+basic > TRUE
+1
+basic > FALSE
+0
+
+##############################
+# IF THEN ELIF ELSE Statements
+##############################
+
+basic > IF 5 == 5 THEN 123
+123
+basic > IF 6 == 5 THEN 123  
+basic > IF 6 == 5 THEN 123 ELSE 456 
+456
+basic > VAR age = 19
+19
+basic > VAR price = IF age >= 18 THEN 40 ELSE 20
+40
+
+##############################
+# FOR TO STEP WHILE Statements
+##############################
+
+basic > VAR result = 1
+1
+basic > FOR i = 1 TO 6 THEN VAR result = result * i 
+basic > result
+120
+
+basic > VAR  result = 1
+1
+basic > FOR i = 5 TO 0 STEP -1 THEN VAR result = result * i
+basic > result
+120
+
+basic > WHILE i < 100000 THEN VAR i = i + 1
 
 
