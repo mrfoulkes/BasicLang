@@ -156,6 +156,49 @@ basic > WHILE i < 100000 THEN VAR i = i + 1
 # FUN funtion definitions and usage
 ##############################
 
+basic > FUN add (a, b) -> a + b
+<function add>
+basic > add( 5, 6)
+11      
 
+basic > VAR some_func = add
+<function add>
+basic > some_func(3, 6)
+9
 
+basic > FUN (a) -> a + 6
+<function <anonymous>>
 
+basic > VAR some_func = FUN (a) -> a + 6
+<function <anonymous>>
+basic > some_func(12)
+18
+
+basic > FUN test(a) -> a / 0
+<function test>
+basic > test(123)
+Traceback (most recent call last):
+  File <stdin>, line 1, in <program>
+  File <stdin>, line 1, in test
+Runtime Error: Division by zero
+
+FUN test(a) -> a / 0
+                   ^
+
+##############################
+# STRINGS
+##############################
+
+basic > "this is a string"
+"this is a string"
+
+basic > "this is" + " a string"
+"this is a string"
+
+basic > "hello " * 3
+"hello hello hello "
+
+basic > FUN greet(person, emphasization) -> "Hello, " * emphasization + person
+<function greet>
+basic > greet("Rich", 3)
+"Hello, Hello, Hello, Rich"
