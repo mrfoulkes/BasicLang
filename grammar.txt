@@ -15,11 +15,11 @@ term            : factor ((MUL|DIV) factor)*
 factor          : (PLUS|MINUS) factor
                 : power
 
-power           : atom (POW factor)*
+power           : call (POW factor)*
 
 call            : atom (LPAREN (expr (COMMA expr)*)? RPAREN)?
 
-atom            : INT|FLOAT|IDENTIFIER
+atom            : INT|FLOAT|STRING|IDENTIFIER
                 : LPAREN expr RPAREN
                 : list-expr
                 : if-expr
@@ -228,3 +228,56 @@ basic > [1,2,3]/0
 basic > FOR i = 1 TO 9 THEN 2^i
 [2, 4, 8, 16, 32, 64, 128, 256]
 
+##############################
+# BUILT IN FUNCTIONS
+##############################
+
+basic > MATH_PI
+3.141592653589793
+
+basic > PRINT("Hello World!")
+Hello World!
+0
+
+basic > VAR name = INPUT()
+Rich !!!
+Rich !!!
+basic > name
+Rich !!!
+
+basic > VAR age = INPUT_INT()
+sdhjfg
+'sdhjfg' must be an integer. Try again!
+12
+12
+basic > age
+12
+
+basic > IS_NUM(123)
+1       
+basic > IS_NUM([])
+0       
+basic > IS_STR("abba")
+1       
+basic > IS_LIST([1,2,3])
+1       
+basic > IS_FUN(PRINT) 
+1       
+
+basic > VAR list = [1,2,3]
+1, 2, 3 
+
+basic > APPEND(list, 4)
+0
+basic > list
+1, 2, 3, 4
+
+basic > POP(list ,3)
+4
+basic > list
+1, 2, 3
+
+basic > EXTEND(list, [4,5,6])
+0
+basic > list
+1, 2, 3, 4, 5, 6
