@@ -21,10 +21,13 @@ call            : atom (LPAREN (expr (COMMA expr)*)? RPAREN)?
 
 atom            : INT|FLOAT|IDENTIFIER
                 : LPAREN expr RPAREN
+                : list-expr
                 : if-expr
                 : for-expr
                 : while-expr
                 : func-def
+
+list-expr		: LSQUARE (expr (COMMA expr)*)? RSQUARE
 
 if-expr         : KEYWORD:IF expr KEYWORD:THEN expr
                   (KEYWORD:ELIF expr KEYWORD:THEN expr)*
@@ -202,3 +205,26 @@ basic > FUN greet(person, emphasization) -> "Hello, " * emphasization + person
 <function greet>
 basic > greet("Rich", 3)
 "Hello, Hello, Hello, Rich"
+
+##############################
+# LISTS
+##############################
+
+basic > [1,2,3,4]
+[1, 2, 3, 4]
+
+basic > [1,2,3] + 4
+[1, 2, 3, 4]
+
+basic > [1,2,3] + [4,5,6]
+[1, 2, 3, [4, 5, 6]]
+
+basic > [1,2,3]*[4,5,6]
+[1, 2, 3, 4, 5, 6]
+
+basic > [1,2,3]/0
+1
+
+basic > FOR i = 1 TO 9 THEN 2^i
+[2, 4, 8, 16, 32, 64, 128, 256]
+
