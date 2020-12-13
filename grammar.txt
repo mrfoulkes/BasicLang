@@ -343,3 +343,17 @@ basic > WHILE i < 10 THEN; VAR i = i + 1; IF i == 4 THEN CONTINUE; IF i == 8 THE
 basic > a
 1, 2, 3, 5, 6, 7
 
+##############################
+# RUN and COMMENT
+##############################
+
+basic > # a comment
+
+basic > RUN("example.myopl")
+Greetings universe!
+loop, spoop        
+loop, spoop        
+loop, spoop        
+loop, spoop        
+loop, spoop        
+0
