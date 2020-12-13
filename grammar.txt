@@ -2,7 +2,12 @@
 # defined in order of priority with least at top.
 
 
-statements      : NEWLINE* expr (NEWLINE+ expr)* NEWLINE*
+statements      : NEWLINE* statement (NEWLINE+ statement)* NEWLINE*
+
+statement       : KEYWORD:RETURN expr?
+                : KEYWORD:CONTINUE
+                : KEYWORD:BREAK
+                : expr
 
 expr            : KEYWORD:VAR IDENTIFIER EQ expr
                 : comp-expr ((KEYWORD:AND|KEYWORD:OR) comp-expr)*
@@ -29,28 +34,28 @@ atom            : INT|FLOAT|STRING|IDENTIFIER
                 : while-expr
                 : func-def
 
-list-expr		: LSQUARE (expr (COMMA expr)*)? RSQUARE
+list-expr       : LSQUARE (expr (COMMA expr)*)? RSQUARE
 
 if-expr         : KEYWORD:IF expr KEYWORD:THEN
-                  (expr if-expr-b|if-expr-c?)
+                  (statement if-expr-b|if-expr-c?)
                 | (NEWLINE statements KEYWORD:END|if-expr-b|if-expr-c)
 
 if-expr-b       : KEYWORD:ELIF expr KEYWORD:THEN
-                  (expr if-expr-b|if-expr-c?)
+                  (statement if-expr-b|if-expr-c?)
                 | (NEWLINE statements KEYWORD:END|if-expr-b|if-expr-c)
 
 if-expr-c       : KEYWORD:ELSE
-                  expr
+                  statement
                 | (NEWLINE statements KEYWORD:END)
 
 for-expr        : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:TO expr
                   (KEYWORD:STEP expr)? KEYWORD:THEN
-                  expr
+                  statement
                 | (NEWLINE statements KEYWORD:END)
 
 
 while-expr      : KEYWORD:WHILE expr KEYWORD:THEN
-                  expr
+                  statement
                 | (NEWLINE statements KEYWORD:END)
 
 
@@ -314,3 +319,27 @@ basic > IF 5 == 5 THEN; PRINT("math"); PRINT("works") ELSE PRINT("broken")
 math
 works
 0
+
+##############################
+# RETURN, CONTINUE, BREAK
+##############################
+
+basic > FUN test(); VAR foo = 5; RETURN foo; END  
+<function test>
+basic > test()
+5
+
+basic > VAR a = []
+basic > FOR i = 0 TO 10 THEN; IF i == 4 THEN CONTINUE ELIF i == 8 THEN BREAK; VAR a = a + i; END
+0
+basic > a
+0, 1, 2, 3, 5, 6, 7
+
+basic > VAR a = []
+basic > VAR i = 0
+0
+basic > WHILE i < 10 THEN; VAR i = i + 1; IF i == 4 THEN CONTINUE; IF i == 8 THEN BREAK; VAR a = a + i; END
+0
+basic > a
+1, 2, 3, 5, 6, 7
+
